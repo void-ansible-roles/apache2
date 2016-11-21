@@ -1,25 +1,47 @@
 ---
 - name: Configure firewall for apache2
-  copy: src=apache2.rules dest=/etc/iptables.d/apache2.rules owner=root group=root mode=0640
+  copy:
+    src: apache2.rules
+    dest: /etc/iptables.d/apache2.rules
+    owner: root
+    group: root
+    mode: 0640
   notify:
     - iptables
 
 - name: Install apache2
-  xbps: name=apache state=present
+  xbps:
+    name: apache
+    state: present
 
 - name: Configure webserver
-  template: src=httpd.conf dest=/etc/httpd/httpd.conf owner=root group=root mode=0644
+  template:
+    src: httpd.conf
+    dest: /etc/httpd/httpd.conf
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Create sites-enabled and sites-available
-  file: path=/etc/httpd/{{ item }} state=directory owner=root group=root mode=0755
+  file:
+    path: "/etc/httpd/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
   with_items:
     - sites-available
     - sites-enabled
 
 - name: Enable httpd
-  file: src=/etc/sv/apache dest=/var/service/apache state=link owner=root group=root mode=0755
+  file:
+    src: /etc/sv/apache
+    dest: /var/service/apache
+    state: link
 
 - name: Disable old default site
-  file: path=/etc/httpd/sites-enabled/default state=absent
+  file:
+    path: /etc/httpd/sites-enabled/default
+    state: absent
   notify:
     - apache2
